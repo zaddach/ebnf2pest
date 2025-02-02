@@ -1,0 +1,72 @@
+Grammar = { SOI ~ NEWLINE* ~ ProductionOrEmptyLine+ ~ NEWLINE* ~ EOI }
+ProductionOrComment = {
+    Production
+    | Comment
+}
+Comment = ${ (!"\n" ~ ANY)* ~ NEWLINE }
+ProductionOrEmptyLine = {
+	Production
+    | EmptyLine
+}
+EmptyLine = _{ NEWLINE }
+Production = { Identifier ~ COLON_EQUAL ~ NEWLINE? ~ RuleOrNote ~ NEWLINE }
+RuleOrNote = {
+	Note | Rule
+}
+Note = { NOTE ~ NoteText }
+NoteText = @{ (!"\n" ~ ANY)+ }
+Rule = {
+    Concatenation ~ (NEWLINE? ~ BAR ~ NEWLINE? ~ Concatenation)*
+}
+
+Concatenation = {
+    RepeatableFactor ~ (NEWLINE? ~ RepeatableFactor)*
+}
+
+RepeatableFactor = {
+    (OperatorOrIdentifier ~ ELLIPSIS?)
+    | TerminalOrToken
+}
+TerminalOrToken = {
+	Terminal
+    | Token
+}
+Token = @{ (ASCII_ALPHA_UPPER | ASCII_DIGIT | "_")+ }
+OperatorOrIdentifier = {
+    Operator
+    | Note
+    | Identifier
+}
+Operator = {
+    Grouping
+    | Option
+}
+Grouping = {
+    "{" ~ NEWLINE? ~ Rule ~ NEWLINE? ~ "}"
+}
+Option = {
+    "[" ~ NEWLINE? ~ Rule ~ NEWLINE? ~ "]"
+}
+Terminal = ${ "\"" ~ EscapedTerminal+ ~ "\"" }
+EscapedTerminal = {
+    EscapeSequence
+    | UnescapedTerminal
+}
+EscapeSequence = {
+    ("\\" ~ EscapedChar)
+}
+EscapedChar = {
+    "\\" | "n" | "t" | "\""
+}
+UnescapedTerminal = {
+    (!"\"" ~ TERMINAL)
+}
+Identifier = { "<" ~ IdentifierName ~ ">" }
+IdentifierName = @{ ( ASCII_ALPHANUMERIC | " " | "-" | "_" | "/")* }
+COLON_EQUAL = _{ "::=" }
+NOTE = @{ "!!" }
+ELLIPSIS = @{ "..." }
+BAR = @{ "|" }
+WHITESPACE = _{ " " | "\t" }
+COMMENT = _{ "//" ~ (!"\n" ~ ANY)* }
+TERMINAL = @{ ASCII_ALPHANUMERIC | " " | "&" | "*" | ":" | "," | "@" | "$" | "\"" | "=" | "!" | ">" | "`" | "{" | "[" | "(" | "<" | "-" | "%" | "." | "+" | "?" | "'" | "\\" | "}" | "]" | ")" | "/" | "~" | "_" | "|" }

@@ -1,0 +1,13 @@
+[package]
+name = "ebnf2pest"
+version = "0.1.0"
+edition = "2021"
+authors = ["Jonas Zaddach <jonas.zaddach@gmail.com>"]
+description = "Tool to convert the ISO 39075:2024 EBNF grammar to Pest"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+clap = { version = "4.5.27", features = ["derive"] }
+convert_case = "0.7.1"
+pest = { version = "2.7.15", features = ["pretty-print"] }
+pest_derive = "2.7.15"
